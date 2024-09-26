@@ -1,26 +1,28 @@
 import { NestFactory } from '@nestjs/core';
-import { ScraperModule } from './scraper/scraper.module';
+// import { ScraperModule } from './scraper/scraper.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ScraperModule);
+  const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
+  const descriptionDoc = `Here some about the documentation.`;
+  const config = new DocumentBuilder()
+    // .addBearerAuth()
+    .setTitle('Documentation')
+    .setDescription(descriptionDoc)
+    .setVersion('1.0')
+    .addTag('product')
+    .build();
+  // .addTag('auth')
+  // .addTag('user')
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
+  app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(5050);
 }
 bootstrap();
-
-// import { NestFactory } from '@nestjs/core';
-// import { ScraperModule } from './scraper/scraper.module';
-// import { NestExpressApplication } from '@nestjs/platform-express';
-// import { join } from 'path';
-
-// async function bootstrap() {
-//   const app = await NestFactory.create<NestExpressApplication>(ScraperModule);
-
-//   // Configurar la carpeta donde se encuentran las vistas
-//   app.setBaseViewsDir(join(__dirname, '..', './src/views'));
-
-//   // Configurar el motor de plantillas
-//   app.setViewEngine('ejs');
-//   await app.listen(5050);
-// }
-// bootstrap();

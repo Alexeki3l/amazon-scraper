@@ -1,5 +1,6 @@
 interface ResultGeneral {
-  img: string;
   name: string;
   price: string;
+  img: string;
+  url: string;
 }

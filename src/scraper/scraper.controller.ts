@@ -1,25 +1,55 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
 import { ScraperService } from './scraper.service';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('scraper')
 @Controller('scraper')
 export class ScraperController {
   constructor(private readonly scraperService: ScraperService) {}
 
-  @Get()
-  async searchProducts(@Query('nameProduct') nameProduct: string) {
+  @ApiOperation({
+    summary: 'Busca producto en amazon basado en un nombre',
+    description:
+      'Busca productos en Amazon basado en un nombre y lo guarda en base de datos.',
+  })
+  @Get('by_name')
+  async searchProductsByName(@Query('nameProduct') nameProduct: string) {
     if (!nameProduct)
       return {
         status: HttpStatus.BAD_REQUEST,
-        message: 'El nombre del producto esta vacio',
+        message: 'missing name product.',
       };
     const response =
       await this.scraperService.searchProductsByName(nameProduct);
     if (response instanceof Array) {
-      return { response };
+      return { status: HttpStatus.OK, message: 'operation successfully' };
     } else {
       return {
         status: HttpStatus.BAD_REQUEST,
-        response,
+        message: 'error',
+      };
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Busca producto en amazon basado en su URL',
+    description:
+      'Busca un producto en Amazon basado en su URL y lo guarda/actualiza en base de datos.',
+  })
+  @Get('by_url')
+  async searchProductsByUrl(@Query('url') url: string) {
+    if (!url)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'missing url of product.',
+      };
+    const response = await this.scraperService.searchProductsByUrl(url);
+    if (response instanceof Array) {
+      return { status: HttpStatus.OK, message: 'operation successfully' };
+    } else {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'error',
       };
     }
   }
