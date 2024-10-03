@@ -41,27 +41,28 @@ export async function recursivaAux(
   console.log(arrayURLs);
 
   for (let index = 0; index < arrayURLs.length; index++) {
-    const url = arrayURLs[index];
+    try {
+      const url = arrayURLs[index];
 
-    if (!arrayURLsVisited.includes(url)) {
-      arrayURLsVisited.push(url);
-      await page.goto(`${urlBase}${url}`);
-      await page.waitForLoadState(); // Esperar a que la página cargue
+      if (!arrayURLsVisited.includes(url)) {
+        arrayURLsVisited.push(url);
+        await page.goto(`${urlBase}${url}`);
+        await page.waitForLoadState(); // Esperar a que la página cargue
 
-      const isSon = (
-        await waitAllAsyncHref(await sonElementsUrl.all())
-      ).includes(url);
+        const isSon = (
+          await waitAllAsyncHref(await sonElementsUrl.all())
+        ).includes(url);
 
-      if (isSon) {
-        arrayProducts.push(
-          ...(await takeProductDataAndAddToArray(page, arrayProducts)),
-        );
-        console.log('Add Productos a ArrayProducts');
-      } else {
-        console.log("Entro a 'recursivaAux'");
-        await screenshot(page);
-        await recursivaAux(page, arrayURLs, arrayURLsVisited, arrayProducts);
+        if (isSon) {
+          arrayProducts.push(
+            ...(await takeProductDataAndAddToArray(page, arrayProducts)),
+          );
+        } else {
+          await recursivaAux(page, arrayURLs, arrayURLsVisited, arrayProducts);
+        }
       }
+    } catch (error) {
+      break;
     }
   }
 
@@ -82,17 +83,17 @@ async function waitAllAsyncHref(arrayLocator: Array<Locator>) {
 async function waitAllAsyncText(
   arrayLocator: Array<Locator>,
   arrayLocatorSon: Array<string>,
-): Promise<Locator[]> {
+) {
   return (
     await Promise.all(
       arrayLocator.map(async (element) => ({
-        element, // Guardar el elemento original
-        matches: arrayLocatorSon.includes(await element.textContent()), // Comparar con texto asíncrono
+        texto: await element.textContent(), // Guardar el elemento original
+        matches: !arrayLocatorSon.includes(await element.textContent()), // Comparar con texto asíncrono
       })),
     )
   )
     .filter(({ matches }) => matches) // Filtrar solo los que coinciden
-    .map(({ element }) => element); // Devolver solo los elementos originales
+    .map(({ texto }) => texto); // Devolver solo los elementos originales
 }
 
 export async function screenshot(page: Page) {
@@ -112,6 +113,7 @@ async function takeProductDataAndAddToArray(
   const allElementsSon = await page
     .locator("[role='group'] > [role='treeitem']")
     .allTextContents();
+  console.log(`productALL:${productsAll}`);
   const categoryName = (
     await waitAllAsyncText(allElements, allElementsSon)
   ).join(' => ');

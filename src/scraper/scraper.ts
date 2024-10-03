@@ -1,5 +1,4 @@
-import { chromium, Locator, Page } from 'playwright';
-import { CreateProductOmitIdDto } from 'src/product/dto/create-product.dto';
+import { chromium } from 'playwright';
 import { recursivaAux, screenshot } from './utils';
 
 export async function searchProductsByName(name: string) {
@@ -157,79 +156,6 @@ export async function changeUbication(ubication: string) {
   await browser.close();
 }
 
-/*export async function searchProductsByBestSelling() {
-  const browser = await chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  // page.setDefaultTimeout(15 * 60 * 1000);
-  const url = `${process.env.URL_BEST_SELLING}&language=es_US`;
-  await page.goto(`${url}`);
-
-  try {
-    if (
-      !(await page
-        .locator("[role='treeitem'] > a")
-        .first()
-        .isVisible({ timeout: 2 * 1000 })) //esperar 2segundos para verificar si existe ese elemento
-    ) {
-      page.reload; //si no existe recargamos la pagina
-      await page.waitForLoadState(); //esperamos que cargue la pagina
-    }
-    await page.waitForTimeout(3000);
-    await screenshot(page);
-    const categoryElementsList = await page
-      .locator("[role='treeitem'] > a")
-      .all();
-    console.log(categoryElementsList);
-    const allProductBestSellingList: Array<CreateProductOmitIdDto> = [];
-
-    for (let index = 0; index < categoryElementsList.length; index++) {
-      const categ = categoryElementsList[index];
-      const categoryName = await categ.textContent();
-      await categ.click();
-      await page.waitForLoadState();
-      await screenshot(page);
-      const productsAll = await page.locator('#gridItemRoot').all();
-
-      console.log(productsAll);
-      for (let index = 0; index < productsAll.length; index++) {
-        const element = productsAll[index];
-        console.log(element);
-        const name: string = `${await element.locator('a.a-link-normal').nth(1).textContent()}`;
-        const price: string = `${await element
-          .locator('a.a-link-normal.a-text-normal')
-          .textContent()}`;
-        const img: string = `${await element.locator('img').getAttribute('src')}`;
-        const rating: string = `${await element.locator('a.a-link-normal').nth(2).textContent()}`;
-        const url: string = `${await element
-          .locator('a.a-link-normal')
-          .nth(0)
-          .getAttribute('href')}`;
-
-        const context: CreateProductOmitIdDto = {
-          name,
-          price,
-          img,
-          rating,
-          url,
-          best_selling: true,
-          category: categoryName,
-        };
-        allProductBestSellingList.push(context);
-        console.log('Add in the list');
-      }
-      break;
-    }
-    await browser.close();
-    return allProductBestSellingList;
-  } catch (error) {
-    console.log(error);
-    await screenshot(page);
-    return error;
-  }
-}
-*/
 export async function searchProductsByBestSelling() {
   const browser = await chromium.launch();
   const context = await browser.newContext();

@@ -8,6 +8,9 @@ import {
 import { ProductService } from 'src/product/product.service';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { Product } from 'src/product/entities/product.entity';
+import { Cron } from '@nestjs/schedule';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Injectable()
 export class ScraperService {
@@ -34,6 +37,7 @@ export class ScraperService {
     return product;
   }
 
+  @Cron(`${process.env.CRON_JOBS_BEST_SELLING}`)
   async searchProductsByBestSelling() {
     const res: CreateProductDto[] = await searchProductsByBestSelling();
     if (!(res instanceof Array)) return res;
