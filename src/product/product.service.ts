@@ -34,12 +34,21 @@ export class ProductService {
     return products;
   }
 
+  async findAllProductBestSelling(): Promise<Product[]> {
+    const products = await this.productRepository.find();
+    return products;
+  }
+
   async findOneProductById(id: number): Promise<Product> {
     return await this.productRepository.findOne({ where: { id } });
   }
 
   async findOneProductByName(name: string): Promise<Product> {
     return (await this.productRepository.findOne({ where: { name } })) && null;
+  }
+
+  async findAllProductByBestSelling(): Promise<Product[]> {
+    return await this.productRepository.findBy({ best_selling: true });
   }
 
   async deleteProduct(id: number): Promise<void> {

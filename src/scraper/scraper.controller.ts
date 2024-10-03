@@ -53,4 +53,34 @@ export class ScraperController {
       };
     }
   }
+
+  @ApiOperation({
+    summary: 'Cambia ubicacion por el codigo postal.',
+    description: 'Cambia ubicacion por el codigo postal.',
+  })
+  @Get('best_selling')
+  async searchProductsByBestSelling() {
+    const res = await this.scraperService.searchProductsByBestSelling();
+    if (!(res instanceof Array))
+      return {
+        error: res,
+      };
+    return { status: HttpStatus.OK, message: 'operation successfully' };
+  }
+
+  @ApiOperation({
+    summary: 'Cambia ubicacion por el codigo postal.',
+    description: 'Cambia ubicacion por el codigo postal.',
+  })
+  @Get('change_ubication')
+  async changeUbication(@Query('code_postal') code_postal: string) {
+    console.log(`CONTROLLER: ${code_postal}`);
+    if (!code_postal.length || !(code_postal.length === 5))
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        error:
+          "The 'postal code' field is expected to be sent and its size must be 5 characters.",
+      };
+    return await this.scraperService.changeUbication(code_postal);
+  }
 }

@@ -19,7 +19,7 @@ async function bootstrap() {
   // .addTag('user')
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
 
