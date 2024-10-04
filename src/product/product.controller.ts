@@ -19,6 +19,7 @@ export class ProductController {
   @Post()
   async create(@Body() dataProductDto: CreateProductDto) {
     /**Este controlador es solo de pruebas */
+    console.log('pasa');
     return await this.productService.create(dataProductDto);
   }
 
@@ -29,6 +30,15 @@ export class ProductController {
   @Get()
   async findAll() {
     return await this.productService.findAllProduct();
+  }
+
+  @ApiOperation({
+    summary: 'Obtener todos los productos mas vendidos.',
+    description: 'Retorna todos los productos mas vendidos.',
+  })
+  @Get('best_selling')
+  async findAllProductBestSelling() {
+    return await this.productService.findAllProductByBestSelling();
   }
 
   // @ApiOperation({

@@ -53,4 +53,11 @@ export class ScraperController {
       };
     }
   }
+
+  // @Get('best_selling')
+  // async searchProductsByBestSelling() {
+  //   const res = await this.scraperService.searchProductsByBestSelling();
+  //   if (res) return { status: HttpStatus.OK };
+  //   return { status: HttpStatus.BAD_REQUEST };
+  // }
 }

@@ -1,19 +1,5 @@
 import { chromium } from 'playwright';
-// import { CreateProductDto } from 'src/product/dto/create-product.dto';
-
-export async function scrapeProducts(url: string) {
-  const browser = await chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto(url);
-
-  const productTitles = await page.$$eval('.product-title', (titles) =>
-    titles.map((title) => title.textContent),
-  );
-
-  await browser.close();
-  return productTitles;
-}
+import { recursivaAux, screenshot } from './utils';
 
 export async function searchProductsByName(name: string) {
   try {
@@ -32,10 +18,6 @@ export async function searchProductsByName(name: string) {
     });
 
     const products = await page.locator('.s-card-container > .a-section').all();
-    await page.screenshot({
-      path: `captura-completa-${Date.now()}.png`,
-      fullPage: true,
-    });
 
     console.log(products);
     const allProducts: any[] = [];
@@ -100,5 +82,108 @@ export async function searchProductsByUrl(url: string) {
   } catch (error) {
     // console.log(error);
     return null;
+  }
+}
+
+export async function changeUbication(ubication: string) {
+  const browser = await chromium.launch();
+  const context = await browser.newContext({
+    recordVideo: { dir: './screenshot' },
+  });
+  const page = await context.newPage();
+  page.setDefaultTimeout(60 * 1000);
+  console.log(`SCRAPER: ${ubication}`);
+
+  let error;
+  const url = `${process.env.URL_BEST_SELLING}&language=es_US`;
+
+  await page.goto(`${url}`);
+
+  await page.waitForTimeout(5000);
+  await screenshot(page);
+
+  await page.locator('#nav-global-location-popover-link').click();
+  await screenshot(page);
+
+  await page.waitForLoadState();
+
+  const inputUbication = page.locator('#GLUXZipUpdateInput');
+  await inputUbication.click();
+  await inputUbication.fill(ubication);
+  await screenshot(page);
+
+  const errorElement = page.locator(
+    "//div[contains(text(), 'Introduce un código postal válido')]",
+  );
+
+  await page.waitForSelector(
+    "//input[contains(@class, 'a-button-input') and following-sibling::span[text() = 'Aplicar']]",
+  );
+
+  await page
+    .locator(
+      "//input[contains(@class, 'a-button-input') and following-sibling::span[text() = 'Aplicar']]",
+    )
+    .click();
+  await page.waitForTimeout(1000);
+  await screenshot(page);
+  if (await errorElement.isVisible()) {
+    console.log('codigo postal no existe');
+    return { error: 'El codigo postal no existe' };
+  }
+
+  const buttonDone = page.locator("//button[text() = 'Continuar']").last();
+  if (await buttonDone.isVisible()) {
+    await buttonDone.click();
+  } else {
+    const buttonClose = page.locator("//button[@name='glowDoneButton']");
+    if (!(await buttonClose.isVisible())) {
+      await buttonClose.click();
+    } else {
+      await page.locator("//input[@id='GLUXConfirmClose']").click();
+    }
+  }
+
+  await page.reload();
+  await screenshot(page);
+  if (error) {
+    console.log('lanzar error');
+    return error;
+  }
+
+  console.log('OK');
+  await context.close();
+  await browser.close();
+}
+
+export async function searchProductsByBestSelling() {
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  page.setDefaultTimeout(5 * 60 * 1000);
+  const url = `${process.env.URL_BEST_SELLING}&language=es_US`;
+  await page.goto(`${url}`);
+  // await screenshot(page);
+  try {
+    if (
+      !(await page.locator("[role='treeitem'] ").all()).length //esperar 2segundos para verificar si existe ese elemento
+    ) {
+      page.reload; //si no existe recargamos la pagina
+      await page.waitForLoadState(); //esperamos que cargue la pagina
+    }
+    const arrayProducts = [];
+    const arrayURLs = [];
+    const arrayURLsVisited = [];
+
+    arrayProducts.push(
+      ...(await recursivaAux(page, arrayURLs, arrayURLsVisited, arrayProducts)),
+    );
+
+    await browser.close();
+    return arrayProducts;
+  } catch (error) {
+    console.log(error);
+    return error;
   }
 }

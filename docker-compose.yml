@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  nestjs-app:
+    build:
+      context: . # Indica que se usa el Dockerfile en el directorio actual
+    container_name: nestjs-dev-container
+    ports:
+      - '3000:3000' # Mapea el puerto 3000 del contenedor al 3000 de la máquina local
+    volumes:
+      - .:/app # Mapea el directorio actual al directorio de trabajo en el contenedor
+      - /app/node_modules # Evita conflictos con los módulos de Node.js
+    environment:
+      NODE_ENV: development # Establece el entorno en modo desarrollo
+    command: npm run start:dev # Comando para ejecutar el servidor en modo desarrollo

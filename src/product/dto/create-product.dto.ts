@@ -1,4 +1,3 @@
-import { ParseBoolPipe } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { PrimaryGeneratedColumn } from 'typeorm';
@@ -45,3 +44,5 @@ export class CreateProductDto {
   @ApiProperty()
   category: string;
 }
+
+export type CreateProductOmitIdDto = Omit<CreateProductDto, 'id'>;
