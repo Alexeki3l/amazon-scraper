@@ -2,7 +2,7 @@ import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
 import { ScraperService } from './scraper.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('scraper')
+@ApiTags('Scraper')
 @Controller('scraper')
 export class ScraperController {
   constructor(private readonly scraperService: ScraperService) {}

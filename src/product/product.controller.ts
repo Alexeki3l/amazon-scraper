@@ -1,27 +1,17 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { /*ApiBearerAuth,*/ ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateProductDto } from './dto/create-product.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from './guards/jwtAuthGuard';
 
 // @ApiBearerAuth()
-@ApiTags('product')
+@UseGuards(JwtAuthGuard)
+@ApiTags('Products')
 @Controller('products')
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
     // private readonly userService: UserService,
   ) {}
-  @ApiOperation({
-    summary: 'Crea un producto',
-    description:
-      'Esta ruta es totalmente de prueba ya que no esta validado que los datos que se envien pertenezcan a una ruta real de Amazon. Los datos que se envien seran guardados en BD.',
-  })
-  @Post()
-  async create(@Body() dataProductDto: CreateProductDto) {
-    /**Este controlador es solo de pruebas */
-    console.log('pasa');
-    return await this.productService.create(dataProductDto);
-  }
 
   @ApiOperation({
     summary: 'Obtener todos los productos.',
