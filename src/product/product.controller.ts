@@ -22,33 +22,8 @@ export class ProductController {
   @Get()
   async findAll(
     @Query() searchProducts: SearchProductsDto,
-    @Query() pagination: paginationDefault,
+    @Query() pagination?: paginationDefault,
   ) {
     return await this.productService.findAllProduct(searchProducts, pagination);
   }
-
-  // @ApiOperation({
-  //   summary: 'Obtener todos los productos.',
-  //   description:
-  //     'Retorna todos los productos que esten relacionados con los usuario que coincida con el id proporcionado.',
-  // })
-  // @Get('for_user/:id')
-  // findAllByUser(@Param('id') id: number) {
-  //   return this.productService.findAllByUserId(id);
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.productService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-  //   return this.productService.update(+id, updateProductDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.productService.remove(+id);
-  // }
 }

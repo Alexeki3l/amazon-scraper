@@ -40,7 +40,7 @@ export class ProductService {
       where: { best_selling: searchProducts.best_selling },
       skip: (pagination.page - 1) * pagination.limit,
       take: pagination.limit,
-      order: { id: 'DESC' },
+      order: { updated_at: pagination.orderBy },
     });
 
     const newPagination = new PageMetaDto({

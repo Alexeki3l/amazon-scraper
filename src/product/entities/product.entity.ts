@@ -35,6 +35,6 @@ export class Product {
   @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 }

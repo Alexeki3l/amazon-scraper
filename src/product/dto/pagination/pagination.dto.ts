@@ -1,15 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-// export class PaginationDto {
-//   @ApiProperty()
-//   page: number;
-
-//   @ApiProperty()
-//   limit: number;
-
-//   @ApiProperty()
-//   itemCount: number;
-// }
+export enum EnumOrder {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
 
 export class paginationDefault {
   @ApiProperty()
@@ -17,4 +11,7 @@ export class paginationDefault {
 
   @ApiProperty()
   limit: number;
+
+  @ApiProperty({ enum: EnumOrder })
+  orderBy: EnumOrder;
 }
