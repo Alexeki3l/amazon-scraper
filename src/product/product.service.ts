@@ -4,6 +4,9 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { SearchProductsDto } from './dto/search-product.dto';
+import { paginationDefault } from './dto/pagination/pagination.dto';
+import { PageMetaDto } from './dto/pagination/page-meta.dto';
 
 @Injectable()
 export class ProductService {
@@ -29,9 +32,24 @@ export class ProductService {
     return newProduct;
   }
 
-  async findAllProduct(): Promise<Product[]> {
-    const products = await this.productRepository.find();
-    return products;
+  async findAllProduct(
+    searchProducts: SearchProductsDto,
+    pagination: paginationDefault,
+  ): Promise<{ data: Product[]; pagination: PageMetaDto }> {
+    const data = await this.productRepository.find({
+      where: { best_selling: searchProducts.best_selling },
+      skip: (pagination.page - 1) * pagination.limit,
+      take: pagination.limit,
+      order: { id: 'DESC' },
+    });
+
+    const newPagination = new PageMetaDto({
+      page: pagination.page,
+      limit: pagination.limit,
+      itemCount: data.length,
+    });
+
+    return { data: data, pagination: newPagination };
   }
 
   async findAllProductBestSelling(): Promise<Product[]> {
@@ -47,8 +65,8 @@ export class ProductService {
     return (await this.productRepository.findOne({ where: { name } })) && null;
   }
 
-  async findAllProductByBestSelling(): Promise<Product[]> {
-    return await this.productRepository.findBy({ best_selling: true });
+  async findAllProductByBestSelling(best_selling: boolean): Promise<Product[]> {
+    return await this.productRepository.findBy({ best_selling });
   }
 
   async deleteProduct(id: number): Promise<void> {

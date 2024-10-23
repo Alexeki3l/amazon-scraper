@@ -9,8 +9,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({
-    summary: 'Crear usuarios',
-    description: 'Registrar usuarios',
+    summary: 'Registrar usuarios',
+    description: 'Crear usuarios',
   })
   @Post()
   create(@Body() createUserDto: CreateUserDto) {

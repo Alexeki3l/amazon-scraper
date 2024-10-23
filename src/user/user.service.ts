@@ -17,7 +17,7 @@ export class UserService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     const user1 = await this.findOne(createUserDto.username);
-    if (user1) throw new ConflictException('Este usuario ya existe.');
+    if (user1) throw new ConflictException('User exists');
     const password = await bcrypt.hash(createUserDto.password, 10);
     const payload = {
       sub: createUserDto.username,
@@ -35,6 +35,10 @@ export class UserService {
 
   async findOne(username: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { username } });
+  }
+
+  async findOneByToken(token: string): Promise<User | undefined> {
+    return this.userRepository.findOne({ where: { token } });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

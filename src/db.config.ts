@@ -1,5 +1,4 @@
 import * as dotenv from 'dotenv';
-// import { Product } from './product/entities/product.entity';
 dotenv.config();
 
 function getDatabaseType() {
@@ -17,15 +16,17 @@ function getDatabaseType() {
       throw new Error(`Invalid DATABASE_TYPE: ${databaseType}`);
   }
 }
-
 export function ConfigDatabase() {
   return {
     type: getDatabaseType(),
     host: `${process.env.DATABASE_HOST}`,
-    port: 5432,
+    port: parseInt(process.env.DATABASE_PORT),
     username: `${process.env.DATABASE_USERNAME}`,
     password: `${process.env.DATABASE_PASSWORD}`,
-    synchronize: process.env.SYNCHRONIZE === 'true' ? true : false, // Esto creará las tablas automáticamente (solo para desarrollo)
+    synchronize: `${process.env.SYNCHRONIZE}` === 'true' ? true : false, // Esto creará las tablas automáticamente (solo para desarrollo)
     database: `${process.env.DATABASE_NAME}`,
+    retryAttempts: 100, // numeros de intentos de conectarse a la base de datos
+    retryDelay: 3000, //tiempo de retraso de un intento y otro.
+    autoLoadEntities: true, // las entidades se cargaran automaticamente
   };
 }

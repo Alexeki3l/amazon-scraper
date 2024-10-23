@@ -18,8 +18,6 @@ export async function searchProductsByName(name: string) {
     });
 
     const products = await page.locator('.s-card-container > .a-section').all();
-
-    console.log(products);
     const allProducts: any[] = [];
 
     for (let index = 0; index < products.length; index++) {
@@ -36,6 +34,8 @@ export async function searchProductsByName(name: string) {
             .locator('a.a-link-normal')
             .first()
             .getAttribute('href'),
+          best_selling: false,
+          category: '',
         };
         allProducts.push(context);
       } catch (error) {
