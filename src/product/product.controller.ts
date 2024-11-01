@@ -2,11 +2,11 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from './guards/jwtAuthGuard';
-import { SearchProductsDto } from './dto/search-product.dto';
+import { SearchProductsDto } from './dto/amazon/search-amazon-product.dto';
 import { paginationDefault } from './dto/pagination/pagination.dto';
 
-// @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard)
+// @ApiBearerAuth('token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Products')
 @Controller('products')
 export class ProductController {
@@ -24,6 +24,9 @@ export class ProductController {
     @Query() searchProducts: SearchProductsDto,
     @Query() pagination?: paginationDefault,
   ) {
-    return await this.productService.findAllProduct(searchProducts, pagination);
+    return await this.productService.findAllProductAmazon(
+      searchProducts,
+      pagination,
+    );
   }
 }

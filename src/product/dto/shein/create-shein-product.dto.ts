@@ -1,11 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { PrimaryGeneratedColumn } from 'typeorm';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
-export class CreateProductDto {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class CreateProductSheinDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
@@ -22,12 +24,19 @@ export class CreateProductDto {
   @IsNotEmpty()
   @ApiProperty()
   // @MinLength(15)
-  img: string;
+  us_price: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  rating: string;
+  // @MinLength(15)
+  us_origin_price: string;
+
+  @IsString({ each: true })
+  @IsArray()
+  @ArrayNotEmpty()
+  @ApiProperty()
+  imgs: string[];
 
   @IsString()
   @IsNotEmpty()
@@ -37,12 +46,12 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   @ApiProperty()
-  best_selling?: boolean;
+  category: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty()
-  category: string;
+  discount: string;
 }
 
-export type CreateProductOmitIdDto = Omit<CreateProductDto, 'id'>;
+export type CreateProductOmitIdDto = Omit<CreateProductSheinDto, 'id'>;

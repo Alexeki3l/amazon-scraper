@@ -1,5 +1,5 @@
 import { Locator, Page } from 'playwright';
-import { CreateProductOmitIdDto } from 'src/product/dto/create-product.dto';
+import { CreateProductOmitIdDto } from 'src/product/dto/amazon/create-amazon-product.dto';
 
 /**
  * Suma dos números y retorna el resultado.
@@ -131,7 +131,7 @@ async function takeProductDataAndAddToArray(
       .locator('a.a-link-normal')
       .nth(0)
       .getAttribute('href')}`;
-    console.log({ name, price, img, rating, url });
+    // console.log({ name, price, img, rating, url });
     const context: CreateProductOmitIdDto = {
       name,
       price,
@@ -144,4 +144,10 @@ async function takeProductDataAndAddToArray(
     arrayProducts.push(context);
   }
   return arrayProducts;
+}
+
+export async function scrollBeginToEnd(page: Page) {
+  await page.evaluate(() => {
+    window.scrollBy(0, window.innerHeight); // Scroll vertical según la altura de la ventana
+  });
 }

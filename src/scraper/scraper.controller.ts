@@ -43,7 +43,7 @@ export class ScraperController {
         status: HttpStatus.BAD_REQUEST,
         message: 'missing url of product.',
       };
-    const response = await this.scraperService.searchProductsByUrl(url);
+    const response = await this.scraperService.searchProductsAmazonByUrl(url);
     if (response instanceof Array) {
       return { status: HttpStatus.OK, message: 'operation successfully' };
     } else {

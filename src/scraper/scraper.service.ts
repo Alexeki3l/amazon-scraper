@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   changeUbication,
   searchProductsByName,
-  searchProductsByUrl,
   searchProductsByBestSelling,
+  searchProductsAmazonByUrl,
 } from './scraper';
 import { ProductService } from 'src/product/product.service';
-import { CreateProductDto } from 'src/product/dto/create-product.dto';
-import { Product } from 'src/product/entities/product.entity';
+import { CreateProductAmazonDto } from 'src/product/dto/amazon/create-amazon-product.dto';
+import { ProductAmazon } from 'src/product/entities/product-amazon.entity';
 import { Cron } from '@nestjs/schedule';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -17,33 +17,35 @@ export class ScraperService {
   constructor(private readonly productService: ProductService) {}
 
   async searchProductsByName(name: string) {
-    const products: CreateProductDto[] = await searchProductsByName(name);
+    const products: CreateProductAmazonDto[] = await searchProductsByName(name);
     if (!(products instanceof Array)) return { products };
     products.forEach(async (product) => {
-      await this.productService.create(product);
+      await this.productService.createProductAmazon(product);
     });
     return products;
   }
 
-  async searchProductsByUrl(url: string) {
-    const res: any = await searchProductsByUrl(url);
+  async searchProductsAmazonByUrl(url: string) {
+    const res: any = await searchProductsAmazonByUrl(url);
     if (res === null) return { error: 'Ocurrio un error' };
 
-    const product = new Product();
+    const product = new ProductAmazon();
     Object.assign(product, res);
 
-    await this.productService.create(product);
-    console.log(product);
+    await this.productService.createProductAmazon(product);
     return product;
   }
 
   @Cron(`${process.env.CRON_JOBS_BEST_SELLING}`)
   async searchProductsByBestSelling() {
-    const res: CreateProductDto[] = await searchProductsByBestSelling();
+    const logger = new Logger('ScraperService');
+    logger.log('Scraping Started');
+    const res: CreateProductAmazonDto[] = await searchProductsByBestSelling();
     if (!(res instanceof Array)) return res;
     res.forEach(async (product) => {
-      await this.productService.create(product);
+      await this.productService.createProductAmazon(product);
     });
+    logger.log('Scraping Successfully');
     return res;
   }
 

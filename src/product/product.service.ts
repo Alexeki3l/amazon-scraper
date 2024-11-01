@@ -1,42 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from './entities/product.entity';
+import { ProductAmazon } from './entities/product-amazon.entity';
 import { Repository } from 'typeorm';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { CreateProductDto } from './dto/create-product.dto';
-import { SearchProductsDto } from './dto/search-product.dto';
+import { UpdateProductAmazonDto } from './dto/amazon/update-amazon-product.dto';
+import { CreateProductAmazonDto } from './dto/amazon/create-amazon-product.dto';
+import { SearchProductsDto } from './dto/amazon/search-amazon-product.dto';
 import { paginationDefault } from './dto/pagination/pagination.dto';
 import { PageMetaDto } from './dto/pagination/page-meta.dto';
+import { ProductShein } from './entities/product-shein.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectRepository(Product)
-    private productRepository: Repository<Product>,
+    @InjectRepository(ProductAmazon)
+    private productAmazonRepository: Repository<ProductAmazon>,
+    @InjectRepository(ProductShein)
+    private productSheinRepository: Repository<ProductShein>,
   ) {}
 
-  async create(dataProductDto: CreateProductDto) {
-    const newProduct = new Product();
-    const product = await this.findOneProductByName(dataProductDto.name);
+  /** -------- Amazon Product Options Begin Here -------------- */
+  async createProductAmazon(dataProductDto: CreateProductAmazonDto) {
+    const newProduct = new ProductAmazon();
+    const product = await this.findOneProductAmazonByName(dataProductDto.name);
     if (!product) {
       Object.assign(newProduct, dataProductDto);
-      await this.productRepository.save(newProduct);
+      await this.productAmazonRepository.save(newProduct);
     } else {
-      const updateNow: UpdateProductDto = {
+      const updateNow: UpdateProductAmazonDto = {
         price: dataProductDto.price,
         img: dataProductDto.img,
         rating: dataProductDto.rating,
       };
-      await this.update(product.id, updateNow);
+      await this.updateProductAmazon(product.id, updateNow);
     }
     return newProduct;
   }
 
-  async findAllProduct(
+  async findAllProductAmazon(
     searchProducts: SearchProductsDto,
     pagination: paginationDefault,
-  ): Promise<{ data: Product[]; pagination: PageMetaDto }> {
-    const data = await this.productRepository.find({
+  ): Promise<{ data: ProductAmazon[]; pagination: PageMetaDto }> {
+    const data = await this.productAmazonRepository.find({
       where: { best_selling: searchProducts.best_selling },
       skip: (pagination.page - 1) * pagination.limit,
       take: pagination.limit,
@@ -52,29 +56,41 @@ export class ProductService {
     return { data: data, pagination: newPagination };
   }
 
-  async findAllProductBestSelling(): Promise<Product[]> {
-    const products = await this.productRepository.find();
-    return products;
+  // async findAllProductBestSelling(): Promise<ProductAmazon[]> {
+  //   const products = await this.productAmazonRepository.find();
+  //   return products;
+  // }
+
+  async findOneProductAmazonById(id: string): Promise<ProductAmazon> {
+    return await this.productAmazonRepository.findOne({ where: { id } });
   }
 
-  async findOneProductById(id: number): Promise<Product> {
-    return await this.productRepository.findOne({ where: { id } });
+  async findOneProductAmazonByName(name: string): Promise<ProductAmazon> {
+    return (
+      (await this.productAmazonRepository.findOne({ where: { name } })) && null
+    );
   }
 
-  async findOneProductByName(name: string): Promise<Product> {
-    return (await this.productRepository.findOne({ where: { name } })) && null;
+  async findAllProductAmazonByBestSelling(
+    best_selling: boolean,
+  ): Promise<ProductAmazon[]> {
+    return await this.productAmazonRepository.findBy({ best_selling });
   }
 
-  async findAllProductByBestSelling(best_selling: boolean): Promise<Product[]> {
-    return await this.productRepository.findBy({ best_selling });
+  async deleteProductAmazon(id: number): Promise<void> {
+    await this.productAmazonRepository.delete(id);
   }
 
-  async deleteProduct(id: number): Promise<void> {
-    await this.productRepository.delete(id);
+  async updateProductAmazon(
+    id: string,
+    updateUserDto: UpdateProductAmazonDto,
+  ): Promise<ProductAmazon> {
+    await this.productAmazonRepository.update(id, updateUserDto);
+    return await this.productAmazonRepository.findOne({ where: { id } }); // Devuelve el usuario actualizado
   }
 
-  async update(id: number, updateUserDto: UpdateProductDto): Promise<Product> {
-    await this.productRepository.update(id, updateUserDto);
-    return await this.productRepository.findOne({ where: { id } }); // Devuelve el usuario actualizado
-  }
+  /** -------- Amazon Product Options End Here -------------- */
+
+  /** -------- Shein Product Options Begin Here -------------- */
+  /** -------- Shein Product Options End Here -------------- */
 }
